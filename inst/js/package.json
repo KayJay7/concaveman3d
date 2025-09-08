@@ -1,0 +1,24 @@
+{
+  "name": "concaveman3d",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "quickhull3d": "^3.1.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "point-in-polygon": "^1.1.0",
+    "rbush": "^4.0.1",
+    "robust-predicates": "^3.0.2",
+    "rollup": "^4.50.1",
+    "tinyqueue": "^3.0.0"
+  }
+}

@@ -18,57 +18,53 @@
 #' @export
 
 
-concaveman <- function(points, concavity, length_threshold) UseMethod("concaveman", points)
+concaveman3d <- function(points, concavity, length_threshold) UseMethod("concaveman3d", points)
 
 #' @export
-#' @rdname concaveman
-concaveman.matrix <- function(points, concavity = 2, length_threshold = 0) {
-  ctx <- V8::v8()
-  ctx$source(system.file("js", "concaveman-bundle.js", package = "concaveman")) # local version
-  workhorse <- function(points, concavity, length_threshold) {
-    jscode <- sprintf(
-      "var points = %s; var polygon = concaveman(points, concavity = %s, lengthThreshold = %s);",
-      jsonlite::toJSON(points, dataframe = 'values'),
-      concavity,
-      length_threshold
+#' @rdname concaveman3d
+concaveman3d.matrix <- function(points, concavity = 2, length_threshold = 0) {
+    ctx <- V8::v8()
+    ctx$source(system.file("js", "concaveman3d-bundle.js", package = "concaveman3d")) # local version
+    workhorse <- function(points, concavity, length_threshold) {
+        jscode <- sprintf(
+            "var points = %s; var polygon = concaveman3d(points, concavity = %s, lengthThreshold = %s);",
+            jsonlite::toJSON(points, dataframe = "values"),
+            concavity,
+            length_threshold
+        )
+        ctx$eval(jscode)
+        df <- as.matrix(as.data.frame(ctx$get("polygon")))
+        df
+    }
+    workhorse(points, concavity, length_threshold)
+}
+
+#' @export
+#' @rdname concaveman3d
+concaveman3d.sf <- function(points, concavity = 2, length_threshold = 0) {
+    crs <- sf::st_crs(points)
+    coords <- sf::st_coordinates(points)
+    res <- sf::st_cast(
+        sf::st_linestring(
+            concaveman3d(coords, concavity, length_threshold)
+        ),
+        "POLYGON"
     )
-    ctx$eval(jscode)
-    df <- as.matrix(as.data.frame(ctx$get('polygon')))
-    df
-  }
-  workhorse(points, concavity, length_threshold)
 
+    sf::st_as_sf(sf::st_sfc(res), crs = crs)
 }
 
 #' @export
-#' @rdname concaveman
-concaveman.sf <- function(points, concavity = 2, length_threshold = 0) {
-  
-  crs <- sf::st_crs(points)
-  coords <- sf::st_coordinates(points)
-  res <- sf::st_cast(
-    sf::st_linestring(
-      concaveman(coords, concavity, length_threshold)
-      ), 
-    "POLYGON"
+#' @rdname concaveman3d
+concaveman3d.sfc <- function(points, concavity = 2, length_threshold = 0) {
+    crs <- sf::st_crs(points)
+    coords <- sf::st_coordinates(points)
+    res <- sf::st_cast(
+        sf::st_linestring(
+            concaveman3d(coords, concavity, length_threshold)
+        ),
+        "POLYGON"
     )
-  
-  sf::st_as_sf(sf::st_sfc(res), crs = crs)
-}
 
-#' @export
-#' @rdname concaveman
-concaveman.sfc <- function(points, concavity = 2, length_threshold = 0) {
-  
-  crs <- sf::st_crs(points)
-  coords <- sf::st_coordinates(points)
-  res <- sf::st_cast(
-    sf::st_linestring(
-      concaveman(coords, concavity, length_threshold)
-    ), 
-    "POLYGON"
-  )
-  
-  sf::st_sfc(res, crs = crs)
+    sf::st_sfc(res, crs = crs)
 }
-
