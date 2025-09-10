@@ -1,10 +1,7 @@
 "use strict";
 // import RBush from 'rbush';
 import { Vec3 } from "gl-matrix";
-import { RBush3D } from "rbush-3d";
 import { default as quickHull3d, Face } from "quickhull3d";
-import Queue from "tinyqueue";
-import { orient2d } from "robust-predicates";
 import { clamp, dotSquare } from "./utils";
 
 type Point = [number, number, number];
