@@ -1,10 +1,10 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import terser from "@rollup/plugin-terser";
-
+import typescript from '@rollup/plugin-typescript';
 
 export default {
-    input: 'src/main.js',
+    input: 'src/main.ts',
     output: {
         file: 'concaveman3d-bundle.js',
         format: 'iife',
@@ -13,9 +13,13 @@ export default {
     plugins: [
         nodeResolve({
             browser: true,
-            // preferBuiltins: false,
         }), // pulls deps from node_modules
-        commonjs(), // converts CJS deps to ESM
+        commonjs({
+            include: 'node_modules/**',
+        }), // converts CJS deps to ESM
+        typescript({
+            include: ["src/**/*.ts"]
+        })
         // terser()
     ],
     treeshake: {

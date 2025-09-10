@@ -5,6 +5,7 @@
 \alias{concaveman3d-package}
 \alias{concaveman3d}
 \alias{concaveman3d.matrix}
+\alias{concaveman3d.data.frame}
 \alias{concaveman3d.sf}
 \alias{concaveman3d.sfc}
 \title{concaveman: A very fast 3D concave hull algorithm.}
@@ -12,6 +13,8 @@
 concaveman3d(points, concavity, length_threshold)
 
 \method{concaveman3d}{matrix}(points, concavity = 2, length_threshold = 0)
+
+\method{concaveman3d}{data.frame}(points, concavity = 2, length_threshold = 0)
 
 \method{concaveman3d}{sf}(points, concavity = 2, length_threshold = 0)
 

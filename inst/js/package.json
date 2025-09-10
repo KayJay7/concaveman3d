@@ -3,22 +3,25 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "quickhull3d": "^3.1.1"
-  },
   "devDependencies": {
+    "@eslint/js": "^9.35.0",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@stylistic/eslint-plugin": "^5.3.1",
+    "eslint": "^9.35.0",
+    "gl-matrix": "^4.0.0-beta.2",
+    "globals": "^16.3.0",
     "point-in-polygon": "^1.1.0",
+    "quickhull3d": "^3.1.1",
     "rbush": "^4.0.1",
+    "rbush-3d": "^0.0.4",
     "robust-predicates": "^3.0.2",
     "rollup": "^4.50.1",
-    "tinyqueue": "^3.0.0"
+    "tinyqueue": "^3.0.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.43.0"
   }
 }

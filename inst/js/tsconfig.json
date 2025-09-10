@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",        // modern output, Rollup + terser will handle older if needed
+    "module": "preserve",        // keep ES module syntax for Rollup
+    "moduleResolution": "bundler",
+    "strict": true,            // recommended
+    "esModuleInterop": true,   // makes CommonJS interop cleaner
+    "skipLibCheck": true,
+    "lib" : ["esnext"]
+  },
+  "include": ["src/**/*.ts"]
+}

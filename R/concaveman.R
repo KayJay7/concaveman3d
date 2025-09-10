@@ -41,6 +41,14 @@ concaveman3d.matrix <- function(points, concavity = 2, length_threshold = 0) {
 
 #' @export
 #' @rdname concaveman3d
+concaveman3d.data.frame <- function(points, concavity = 2, length_threshold = 0) {
+    res <- concaveman3d(data.matrix(points), concavity, length_threshold)
+    res
+}
+
+
+#' @export
+#' @rdname concaveman3d
 concaveman3d.sf <- function(points, concavity = 2, length_threshold = 0) {
     crs <- sf::st_crs(points)
     coords <- sf::st_coordinates(points)
