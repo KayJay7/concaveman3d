@@ -4,10 +4,11 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { VertexNormalsHelper } from "three/addons/helpers/VertexNormalsHelper.js";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 import Papa from "papaparse";
+import { SVGRenderer } from "three/addons/renderers/SVGRenderer.js";
 
 let camera: THREE.PerspectiveCamera, controls: OrbitControls, scene: THREE.Scene, renderer: THREE.WebGLRenderer;
 const params = {
-    checkAllFaces: 0,
+    checkAllFaces: false,
     model: 0,
     nPoints: 100,
     concavity: 1,
@@ -53,7 +54,7 @@ function ConvexMesh() {
     const points = params.model === 0 ? generatePointCloud() : datasets[params.model];
     // const points = generatePointCloud();
     const t0 = performance.now();
-    const faces = concaveman3d.concaveman3d(points, params.concavity, params.threshold, params.checkAllFaces > 0);
+    const faces = concaveman3d.concaveman3d(points, params.concavity, params.threshold, params.checkAllFaces);
     const t1 = performance.now();
     console.log(`nPoints=${points.length} timeToCompute = ${t1 - t0}ms`);
     const geometry = new THREE.BufferGeometry();
@@ -96,6 +97,7 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xcccccc);
     scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+    document.getElementById("TO_SVG")?.addEventListener("click", btnSVGExportClick, false);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -148,7 +150,7 @@ function init() {
     scene.add(axesHelper);
 
     const gui = new GUI();
-    gui.add(params, "checkAllFaces", 0, 1, 1).onChange(() => rebuild(group));
+    gui.add(params, "checkAllFaces").onChange(() => rebuild(group));
     gui.add(params, "model", 0, availableDatasets.length, 1).onChange(() => rebuild(group));
     gui.add(params, "nPoints", 4, 1000, 1).onChange(() => rebuild(group));
     gui.add(params, "concavity", 0, 5).onChange(() => rebuild(group));
@@ -159,6 +161,39 @@ function init() {
     gui.add(params, "originZ", -100, 100, 1).onChange(() => rebuild(group));
 
     window.addEventListener("resize", onWindowResize);
+}
+
+function btnSVGExportClick() {
+    // add ambient light to make SVGRenderer happy
+    const ambient = new THREE.AmbientLight("white");
+    scene.add(ambient);
+
+    // the original code
+    const rendererSVG = new SVGRenderer();
+    rendererSVG.setSize(window.innerWidth, window.innerHeight);
+    rendererSVG.render(scene, camera);
+    ExportToSVG(rendererSVG, "test.svg");
+
+    // remove the ambient light
+    scene.remove(ambient);
+}
+
+function ExportToSVG(rendererSVG: SVGRenderer, filename: string) {
+    const XMLS = new XMLSerializer();
+    const svgfile = XMLS.serializeToString(rendererSVG.domElement);
+    const svgData = svgfile;
+    const preface = "<?xml version=\"1.0\" standalone=\"no\"?>\r\n";
+    const svgBlob = new Blob([preface, svgData], {
+        type: "image/svg+xml;charset=utf-8",
+    });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    const downloadLink = document.createElement("a");
+
+    downloadLink.href = svgUrl;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
 }
 
 function onWindowResize() {
