@@ -24,10 +24,10 @@ concaveman3d <- function(points, concavity, length_threshold) UseMethod("concave
 #' @rdname concaveman3d
 concaveman3d.matrix <- function(points, concavity = 2, length_threshold = 0) {
     ctx <- V8::v8()
-    ctx$source(system.file("js", "concaveman3d-bundle.js", package = "concaveman3d")) # local version
+    ctx$source(system.file("js", "static", "concaveman3d-bundle.js", package = "concaveman3d")) # local version
     workhorse <- function(points, concavity, length_threshold) {
         jscode <- sprintf(
-            "var points = %s; var polygon = concaveman3d(points, concavity = %s, lengthThreshold = %s);",
+            "var points = %s; var polygon = concaveman3d.concaveman3dInterop(points, concavity = %s, lengthThreshold = %s);",
             jsonlite::toJSON(points, dataframe = "values"),
             concavity,
             length_threshold

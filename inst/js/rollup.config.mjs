@@ -6,7 +6,7 @@ import typescript from '@rollup/plugin-typescript';
 export default {
     input: 'src/main.ts',
     output: {
-        file: 'concaveman3d-bundle.js',
+        file: 'static/concaveman3d-bundle.js',
         format: 'iife',
         name: 'concaveman3d',
     },
@@ -18,13 +18,13 @@ export default {
             include: 'node_modules/**',
         }), // converts CJS deps to ESM
         typescript({
-            include: ["src/**/*.ts"]
+            compilerOptions: {
+                composite: false,
+                emitDeclarationOnly: false,
+            },
         })
         // terser()
     ],
-    treeshake: {
-        moduleSideEffects: false, // assume modules have no side effects unless marked
-        // propertyReadSideEffects: false, // treat unused property reads as safe to remove (obj.foo with no use won’t be kept)
-    }
+    treeshake: "smallest"
 
 };

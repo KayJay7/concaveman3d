@@ -1,0 +1,1 @@
+{"version":3,"file":"utils.js","sourceRoot":"","sources":["utils.ts"],"names":[],"mappings":"AAAA,MAAM,UAAU,KAAK,CAAC,CAAS,EAAE,GAAW,EAAE,GAAW;IACrD,OAAO,IAAI,CAAC,GAAG,CAAC,IAAI,CAAC,GAAG,CAAC,CAAC,EAAE,GAAG,CAAC,EAAE,GAAG,CAAC,CAAC;AAC3C,CAAC","sourcesContent":["export function clamp(n: number, min: number, max: number) {\n    return Math.min(Math.max(n, min), max);\n}\n"]}

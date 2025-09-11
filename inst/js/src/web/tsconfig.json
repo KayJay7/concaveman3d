@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDirs": [
+      ".",
+      "../.."
+    ],
+    "outDir": "../../static",
+    "emitDeclarationOnly": false,
+    "lib": [
+      "esnext",
+      "DOM"
+    ],
+  },
+  "references": [
+    {"path": "../../"}
+  ],
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "src/*.ts"
+  ]
+}

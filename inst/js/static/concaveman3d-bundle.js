@@ -1,4 +1,4 @@
-var concaveman3d = (function () {
+var concaveman3d = (function (exports) {
     'use strict';
 
     const EPSILON = 0.000001;
@@ -4519,65 +4519,139 @@ var concaveman3d = (function () {
         return instance.collectFaces(options.skipTriangulation);
     }
 
-    // import * as quickhull3d from "quickhull3d";
     function clamp(n, min, max) {
         return Math.min(Math.max(n, min), max);
     }
-    function dotSquare(v) {
-        return v.dot(v);
+
+    class TinyQueue {
+        constructor(data = [], compare = (a, b) => (a < b ? -1 : a > b ? 1 : 0)) {
+            this.data = data;
+            this.length = this.data.length;
+            this.compare = compare;
+
+            if (this.length > 0) {
+                for (let i = (this.length >> 1) - 1; i >= 0; i--) this._down(i);
+            }
+        }
+
+        push(item) {
+            this.data.push(item);
+            this._up(this.length++);
+        }
+
+        pop() {
+            if (this.length === 0) return undefined;
+
+            const top = this.data[0];
+            const bottom = this.data.pop();
+
+            if (--this.length > 0) {
+                this.data[0] = bottom;
+                this._down(0);
+            }
+
+            return top;
+        }
+
+        peek() {
+            return this.data[0];
+        }
+
+        _up(pos) {
+            const {data, compare} = this;
+            const item = data[pos];
+
+            while (pos > 0) {
+                const parent = (pos - 1) >> 1;
+                const current = data[parent];
+                if (compare(item, current) >= 0) break;
+                data[pos] = current;
+                pos = parent;
+            }
+
+            data[pos] = item;
+        }
+
+        _down(pos) {
+            const {data, compare} = this;
+            const halfLength = this.length >> 1;
+            const item = data[pos];
+
+            while (pos < halfLength) {
+                let bestChild = (pos << 1) + 1; // initially it is the left child
+                const right = bestChild + 1;
+
+                if (right < this.length && compare(data[right], data[bestChild]) < 0) {
+                    bestChild = right;
+                }
+                if (compare(data[bestChild], item) >= 0) break;
+
+                data[pos] = data[bestChild];
+                pos = bestChild;
+            }
+
+            data[pos] = item;
+        }
     }
-    // export function min3(a: number, b: number, c: number) {
-    //     return Math.min(a, Math.min(b, c));
-    // }
 
     const vec3 = () => new Vec3([0, 0, 0]);
-    function concaveman(inputPoints, concavity, lengthThreshold) {
+    function concaveman3dInterop(inputPoints, concavity, lengthThreshold) {
+        const points = inputPoints.map(point => new Vec3(point));
+        const concaveHull = concaveman3d(points, concavity, lengthThreshold);
+        return concaveHull.map(face => [inputPoints[face[0]], inputPoints[face[1]], inputPoints[face[2]]]);
+    }
+    function concaveman3d(points, concavity, lengthThreshold, checkAllFaces = true) {
         // a relative measure of concavity; higher value means simpler hull
         concavity = Math.max(0, concavity == undefined ? 2 : concavity);
         const sqConcavity = concavity ** 2;
         // when a segment goes below this length threshold, it won't be drilled down further
         lengthThreshold = lengthThreshold || 0;
         const sqLenThreshold = lengthThreshold ** 2;
-        const points = inputPoints.map(point => new Vec3(point));
         // start with a convex hull of the points
-        const faces = runner(points);
+        const hullFaces = runner(points);
+        const facesQueue = new TinyQueue(hullFaces);
+        const allFaces = new Set(hullFaces);
         const hullVertices = new Set();
         const pointAdjacentFaces = points.map(() => new Set());
-        faces.forEach((face) => {
-            face.forEach((point) => {
+        for (const face of hullFaces) {
+            for (const point of face) {
                 hullVertices.add(point);
                 pointAdjacentFaces[point].add(face);
-            });
-        });
+            }
+        }
         const internalPoints = (new Set(points.keys())).difference(hullVertices);
         const concaveHull = [];
-        while (faces.length > 0) {
-            const face = faces.shift();
-            const point = findPoint(face, points, internalPoints, pointAdjacentFaces);
+        while (facesQueue.length > 0) {
+            const face = facesQueue.pop();
+            const point = findPoint(face, points, checkAllFaces, allFaces, internalPoints, pointAdjacentFaces);
             if (point != null && decision(face, point, sqConcavity, sqLenThreshold, points)) {
-                const newFaces = dig(face, point, hullVertices, internalPoints, pointAdjacentFaces);
-                faces.concat(newFaces);
+                const newFaces = dig(face, point, hullVertices, allFaces, internalPoints, pointAdjacentFaces);
+                for (const face of newFaces) {
+                    facesQueue.push(face);
+                }
             }
             else {
-                concaveHull.push([inputPoints[face[0]], inputPoints[face[1]], inputPoints[face[2]]]);
+                concaveHull.push(face);
             }
         }
         return concaveHull;
     }
-    function dig(face, point, hullVertices, internalPoints, pointAdjacentFaces) {
-        face.forEach((point) => {
-            pointAdjacentFaces[point].delete(face);
-        });
+    function dig(face, point, hullVertices, allFaces, internalPoints, pointAdjacentFaces) {
+        pointAdjacentFaces[face[0]].delete(face);
+        pointAdjacentFaces[face[1]].delete(face);
+        pointAdjacentFaces[face[2]].delete(face);
         const newFaces = [
             [face[0], face[1], point],
             [face[1], face[2], point],
             [face[2], face[0], point],
         ];
-        newFaces.forEach((face) => {
-            face.forEach((point) => {
+        allFaces.delete(face);
+        for (const face of newFaces) {
+            for (const point of face) {
                 pointAdjacentFaces[point].add(face);
-            });
-        });
+                allFaces.add(face);
+            }
+        }
         internalPoints.delete(point);
         hullVertices.add(point);
         return newFaces;
@@ -4595,51 +4669,56 @@ var concaveman3d = (function () {
         const sqD3 = p.sqrDist(v3);
         const sqAvg = (sqL12 + sqL23 + sqL31) / 3;
         const sqDd = Math.min(sqD1, sqD2, sqD3);
-        return (sqDd <= sqAvg / sqConcavity) && (sqAvg >= sqLenThreshold);
+        return (sqAvg / sqDd > sqConcavity) && (sqAvg > sqLenThreshold);
     }
-    function findPoint(face, points, internalPoints, pointAdjacentFaces) {
+    function findPoint(face, points, checkAllFaces, allFaces, internalPoints, pointAdjacentFaces) {
         const v1 = points[face[0]];
         const v2 = points[face[1]];
         const v3 = points[face[2]];
         let closestPoint = null;
         let sqMinDist = 0;
-        const adjacent = Array.from(pointAdjacentFaces[face[0]]
-            .union(pointAdjacentFaces[face[1]])
-            .union(pointAdjacentFaces[face[2]])
+        const toCheck = Array.from((checkAllFaces
+            ? allFaces
+            : (pointAdjacentFaces[face[0]]
+                .union(pointAdjacentFaces[face[1]])
+                .union(pointAdjacentFaces[face[2]])))
             .difference(new Set(face))
             .values()
             .map(face => [points[face[0]], points[face[1]], points[face[2]]]));
-        internalPoints.forEach((candidate) => {
+        for (const candidate of internalPoints) {
             const p = points[candidate];
             const sqDist = dTriangle(v1, v2, v3, p);
-            if ((closestPoint == null || sqDist < sqMinDist) && adjacent.every(face => dTriangle(face[0], face[1], face[2], p) >= sqDist)) {
+            if ((closestPoint == null || sqDist < sqMinDist) && toCheck.every(face => dTriangle(face[0], face[1], face[2], p) >= sqDist)) {
                 closestPoint = candidate;
                 sqMinDist = sqDist;
             }
-        });
+        }
         return closestPoint;
     }
     function dTriangle(v1, v2, v3, p) {
         // prepare data
-        const v12 = v2.sub(v1);
-        const p1 = p.sub(v1);
-        const v23 = v3.sub(v2);
-        const p2 = p.sub(v2);
-        const v31 = v1.sub(v3);
-        const p3 = p.sub(v3);
+        const v12 = Vec3.sub(vec3(), v2, v1);
+        const p1 = Vec3.sub(vec3(), p, v1);
+        const v23 = Vec3.sub(vec3(), v3, v2);
+        const p2 = Vec3.sub(vec3(), p, v2);
+        const v31 = Vec3.sub(vec3(), v1, v3);
+        const p3 = Vec3.sub(vec3(), p, v3);
         const nor = Vec3.cross(vec3(), v12, v31);
         if (Math.sign(Vec3.dot(Vec3.cross(vec3(), v12, nor), p1))
             + Math.sign(Vec3.dot(Vec3.cross(vec3(), v23, nor), p2))
             + Math.sign(Vec3.dot(Vec3.cross(vec3(), v31, nor), p3)) < 2) {
             // 3 edges
-            return Math.min(dotSquare(v12.scale(clamp(v12.dot(p1) / dotSquare(v12), 0, 1)).sub(p1)), dotSquare(v23.scale(clamp(v23.dot(p2) / dotSquare(v23), 0, 1)).sub(p2)), dotSquare(v31.scale(clamp(v31.dot(p3) / dotSquare(v31), 0, 1)).sub(p3)));
+            return Math.min(v12.scale(clamp(v12.dot(p1) / Vec3.squaredLength(v12), 0, 1)).sqrDist(p1), v23.scale(clamp(v23.dot(p2) / Vec3.squaredLength(v23), 0, 1)).sqrDist(p2), v31.scale(clamp(v31.dot(p3) / Vec3.squaredLength(v31), 0, 1)).sqrDist(p3));
         }
         else {
             // 1 face
-            return nor.dot(p1) * nor.dot(p1) / dotSquare(nor);
+            return nor.dot(p1) * (nor.dot(p1) / Vec3.squaredLength(nor));
         }
     }
 
-    return concaveman;
+    exports.concaveman3d = concaveman3d;
+    exports.concaveman3dInterop = concaveman3dInterop;
 
-})();
+    return exports;
+
+})({});

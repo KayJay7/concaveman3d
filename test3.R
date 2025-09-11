@@ -1,4 +1,4 @@
-devtools::load_all("concaveman3d")
+devtools::load_all(".")
 library(concaveman3d)
 library(dplyr)
 #>
@@ -13,7 +13,7 @@ library(purrr)
 library(sf)
 #> Linking to GEOS 3.8.0, GDAL 3.0.4, PROJ 6.3.1
 library(tmap)
-n <- 100000
+n <- 20
 # data(points3d)
 points3d <- data.frame(k = rep(1, n), x = rnorm(n, 5, 6), y = rnorm(n, 5, 6), z = rnorm(n, 5, 6))
 # points3d <- st_as_sf(points3d, coords = c("x", "y", "z"))
