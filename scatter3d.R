@@ -11,7 +11,7 @@ generation <- function(n) {
     range <- 150
     n <- floor(sqrt(n))
     noise <- 3
-    errors <- data.frame(x = rnorm(n^2, 0, noise), y = rnorm(n^2, 0, 2*noise), z = rnorm(n^2, 0, 5 * noise))
+    errors <- data.frame(x = rnorm(n^2, 0, noise), y = rnorm(n^2, 0, 2 * noise), z = rnorm(n^2, 0, 5 * noise))
     x <- seq(-range, range, length.out = n)
     y <- seq(-range, range, length.out = n)
     sample_xy <- expand.grid(x = x, y = y)
@@ -27,7 +27,7 @@ generation2 <- function(n) {
     errors
 }
 
-sample <- generation(3000)
+sample <- generation(300)
 print(sample)
 
 scat <- scatterplot3d(sample$x, sample$y, sample$z, pch = 16, color = "steelblue")
