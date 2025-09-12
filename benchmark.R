@@ -5,7 +5,6 @@ library("scatterplot3d")
 
 par(mfrow = c(1, 1))
 
-# se <- function(x) sd(x) / sqrt(length(x))
 shape <- function(x, y) 10 + (x / 15)^2 + 15 * sin(y / 6) + (y / 20)^2
 
 generation <- function(n) {
@@ -30,8 +29,6 @@ generation2 <- function(n) {
 
 sample <- generation(3000)
 print(sample)
-# plot( sample)
-# plot_ly(sample$x, sample$y, sample$z)
 
 scat <- scatterplot3d(sample$x, sample$y, sample$z, pch = 16, color = "steelblue")
 
