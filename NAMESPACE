@@ -2,6 +2,4 @@
 
 S3method(concaveman3d,data.frame)
 S3method(concaveman3d,matrix)
-S3method(concaveman3d,sf)
-S3method(concaveman3d,sfc)
 export(concaveman3d)

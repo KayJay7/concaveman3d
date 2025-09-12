@@ -133,9 +133,7 @@ function findPoint(
     const toCheck = Array.from(
         (checkAllFaces
             ? allFaces
-            : (pointAdjacentFaces[face[0]]
-                .union(pointAdjacentFaces[face[1]])
-                .union(pointAdjacentFaces[face[2]])))
+            : (pointAdjacentFaces[face[0]].union(pointAdjacentFaces[face[1]]).union(pointAdjacentFaces[face[2]])))
             .difference(new Set(face))
             .values()
             .map(face => [points[face[0]], points[face[1]], points[face[2]]]));
