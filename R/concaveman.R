@@ -1,19 +1,15 @@
-#' A very fast 2D concave hull algorithm
+#' A 3D concave hull algorithm
 #'
-#' The `concaveman` function ports the [concaveman](https://github.com/mapbox/concaveman) library from mapbox. It computes the concave polygon for one set of points.
-#'
-#' For details regarding the implementation, please see the original javascript library [github page](https://github.com/mapbox/concaveman). This is just a thin wrapper, via [`V8`](https://cran.r-project.org/package=V8).
+#' 3D implementation of the Park-Oh algorithm (https://jise.iis.sinica.edu.tw/JISESearch/fullText?pId=245&code=5A9B97538372AA1)
 #'
 #' @param points the points for which the concave hull must be computed. Can be represented as a matrix of coordinates or an `sf` object.
 #' @param concavity a relative measure of concavity. 1 results in a relatively detailed shape, Infinity results in a convex hull. You can use values lower than 1, but they can produce pretty crazy shapes.
 #' @param length_threshold when a segment length is under this threshold, it stops being considered for further detalization. Higher values result in simpler shapes.
 #'
-#' @return an object of the same class as `points`: a matrix of coordinates or an `sf` object.
+#' @return an object of the same class as `points`: a matrix of coordinates or a data.frame.
 #' @examples
 #' data(points)
 #' polygons <- concaveman(points)
-#' plot(points)
-#' plot(polygons, add = TRUE)
 #'
 #' @export
 concaveman3d <- function(points, concavity, length_threshold) UseMethod("concaveman3d", points)
