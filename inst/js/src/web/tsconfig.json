@@ -6,6 +6,7 @@
       "../.."
     ],
     "outDir": "../../static",
+    "composite": false,
     "emitDeclarationOnly": false,
     "lib": [
       "esnext",
@@ -13,12 +14,12 @@
     ],
   },
   "references": [
-    {"path": "../../"}
+    {
+      "path": "../../"
+    }
   ],
   "include": [
-    "**/*.ts"
+    "*.ts"
   ],
-  "exclude": [
-    "src/*.ts"
-  ]
+  "exclude": []
 }

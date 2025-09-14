@@ -14,7 +14,7 @@ export function concaveman3dInterop(inputPoints: Point[], concavity: number, len
     return concaveHull.map(face => [inputPoints[face[0]], inputPoints[face[1]], inputPoints[face[2]]]);
 }
 
-export function concaveman3d(points: Vec3[], concavity: number, lengthThreshold: number, checkAllFaces = true): Face[] {
+export function concaveman3d(points: Vec3[], concavity: number, lengthThreshold: number, checkAllFaces = false): Face[] {
     // a relative measure of concavity; higher value means simpler hull
     concavity = Math.max(0, concavity == undefined ? 2 : concavity);
     const sqConcavity = concavity ** 2;

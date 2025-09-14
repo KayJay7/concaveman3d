@@ -4600,7 +4600,7 @@ var concaveman3d = (function (exports) {
         const concaveHull = concaveman3d(points, concavity, lengthThreshold);
         return concaveHull.map(face => [inputPoints[face[0]], inputPoints[face[1]], inputPoints[face[2]]]);
     }
-    function concaveman3d(points, concavity, lengthThreshold, checkAllFaces = true) {
+    function concaveman3d(points, concavity, lengthThreshold, checkAllFaces = false) {
         // a relative measure of concavity; higher value means simpler hull
         concavity = Math.max(0, concavity == undefined ? 2 : concavity);
         const sqConcavity = concavity ** 2;
@@ -4679,9 +4679,7 @@ var concaveman3d = (function (exports) {
         let sqMinDist = 0;
         const toCheck = Array.from((checkAllFaces
             ? allFaces
-            : (pointAdjacentFaces[face[0]]
-                .union(pointAdjacentFaces[face[1]])
-                .union(pointAdjacentFaces[face[2]])))
+            : (pointAdjacentFaces[face[0]].union(pointAdjacentFaces[face[1]]).union(pointAdjacentFaces[face[2]])))
             .difference(new Set(face))
             .values()
             .map(face => [points[face[0]], points[face[1]], points[face[2]]]));
