@@ -1,0 +1,4 @@
+ipykernel
+pydantic
+pyvista[all]
+https://github.com/bellockk/alphashape.git
