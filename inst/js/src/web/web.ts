@@ -20,6 +20,7 @@ const params = {
 };
 
 const availableDatasets = [
+    "points3d",
     "chair",
     "mug",
 ];

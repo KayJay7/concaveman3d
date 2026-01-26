@@ -18,6 +18,7 @@ const params = {
     originZ: 0,
 };
 const availableDatasets = [
+    "points3d",
     "chair",
     "mug",
 ];

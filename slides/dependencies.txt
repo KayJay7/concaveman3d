@@ -1,4 +1,5 @@
 ipykernel
 pydantic
 pyvista[all]
+trame_jupyter_extension
 https://github.com/bellockk/alphashape.git

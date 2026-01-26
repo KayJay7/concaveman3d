@@ -2805,17 +2805,17 @@ var concaveman3d = (function (exports) {
     function requireBrowser () {
     	if (hasRequiredBrowser) return browser.exports;
     	hasRequiredBrowser = 1;
-    	(function (module, exports) {
+    	(function (module, exports$1) {
     		/**
     		 * This is the web browser implementation of `debug()`.
     		 */
 
-    		exports.formatArgs = formatArgs;
-    		exports.save = save;
-    		exports.load = load;
-    		exports.useColors = useColors;
-    		exports.storage = localstorage();
-    		exports.destroy = (() => {
+    		exports$1.formatArgs = formatArgs;
+    		exports$1.save = save;
+    		exports$1.load = load;
+    		exports$1.useColors = useColors;
+    		exports$1.storage = localstorage();
+    		exports$1.destroy = (() => {
     			let warned = false;
 
     			return () => {
@@ -2830,7 +2830,7 @@ var concaveman3d = (function (exports) {
     		 * Colors.
     		 */
 
-    		exports.colors = [
+    		exports$1.colors = [
     			'#0000CC',
     			'#0000FF',
     			'#0033CC',
@@ -2995,7 +2995,7 @@ var concaveman3d = (function (exports) {
     		 *
     		 * @api public
     		 */
-    		exports.log = console.debug || console.log || (() => {});
+    		exports$1.log = console.debug || console.log || (() => {});
 
     		/**
     		 * Save `namespaces`.
@@ -3006,9 +3006,9 @@ var concaveman3d = (function (exports) {
     		function save(namespaces) {
     			try {
     				if (namespaces) {
-    					exports.storage.setItem('debug', namespaces);
+    					exports$1.storage.setItem('debug', namespaces);
     				} else {
-    					exports.storage.removeItem('debug');
+    					exports$1.storage.removeItem('debug');
     				}
     			} catch (error) {
     				// Swallow
@@ -3025,7 +3025,7 @@ var concaveman3d = (function (exports) {
     		function load() {
     			let r;
     			try {
-    				r = exports.storage.getItem('debug') || exports.storage.getItem('DEBUG') ;
+    				r = exports$1.storage.getItem('debug') || exports$1.storage.getItem('DEBUG') ;
     			} catch (error) {
     				// Swallow
     				// XXX (@Qix-) should we be logging these?
@@ -3061,7 +3061,7 @@ var concaveman3d = (function (exports) {
     			}
     		}
 
-    		module.exports = /*@__PURE__*/ requireCommon()(exports);
+    		module.exports = /*@__PURE__*/ requireCommon()(exports$1);
 
     		const {formatters} = module.exports;
 
